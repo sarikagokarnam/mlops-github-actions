@@ -1,0 +1,46 @@
+
+name: MLOps CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  train-model:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout repository
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Step 2: Setup Python
+      - name: Set Up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      # Step 3: Install dependencies
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      # Step 4: Train ML model
+      - name: Train ML Model
+        run: python train.py
+
+      # Step 5: Upload model artifact
+      - name: Upload Model Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: trained-model
+          path: model.pkl
+          if-no-files-found: error
+
+      # Step 6: Deploy model (simulation)
+      - name: Deploy Model
+        env:
+          ENVIRONMENT: ${{ secrets.DEPLOY_ENV }}
+        run: |
+          echo "Deploying model to $ENVIRONMENT environment"
+          echo "Model deployment completed successfully."
